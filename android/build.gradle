@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "21.1.2"
-    compileSdkVersion 21
+    buildToolsVersion "19.1.0"
+    compileSdkVersion 19
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -13,7 +13,21 @@ android {
 
         instrumentTest.setRoot('tests')
     }
+//    signingConfigs {
+//        release {
+//            storeFile file("/Users/stef/Desktop/dbashout/androidkey/db")
+//            storePassword "insertpasswordhere"
+//            keyAlias "dbashkey"
+//            keyPassword "insertpasswordhere"
+//        }
+//    }
+//    buildTypes {
+//        release {
+//            signingConfig signingConfigs.release
+//        }
+//    }
 }
+
 
 // needed to add JNI shared libraries to APK when compiling on CLI
 tasks.withType(com.android.build.gradle.tasks.PackageApplication) { pkgTask ->
@@ -45,24 +59,7 @@ task copyAndroidNatives() {
 }
 
 task run(type: Exec) {
-    def path
-    def localProperties = project.file("../local.properties")
-    if (localProperties.exists()) {
-        Properties properties = new Properties()
-        localProperties.withInputStream { instr ->
-            properties.load(instr)
-        }
-        def sdkDir = properties.getProperty('sdk.dir')
-        if (sdkDir) {
-            path = sdkDir
-        } else {
-            path = "$System.env.ANDROID_HOME"
-        }
-    } else {
-        path = "$System.env.ANDROID_HOME"
-    }
-
-    def adb = path + "/platform-tools/adb"
+    def adb = "$System.env.ANDROID_HOME/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.me.dbash.android/com.me.dbash.android.AndroidLauncher'
 }
 
@@ -82,7 +79,7 @@ eclipse {
     }
 
     classpath {
-        plusConfigurations += [ project.configurations.compile ]        
+        plusConfigurations += project.configurations.compile        
         containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'       
     }
 
